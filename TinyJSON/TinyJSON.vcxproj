@@ -141,6 +141,12 @@
   <ItemGroup>
     <None Include="..\README.md" />
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Json.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Json.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
