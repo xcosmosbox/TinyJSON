@@ -76,7 +76,7 @@ public:
 	*
 	* Return value: String (Tree string parsed from item node)
 	*/
-	Node* Print(Node* item);
+	string Print(Node* item);
 
 	/*
 	* Function: Recursively release the nodes of the JSON tree from the root node to free memory
@@ -96,6 +96,52 @@ public:
 	* Return value: JsonValueType::VALUE_TYPE_OBJECT
 	*/
 	Node* Create_Object();
+
+	/*
+	* Function: Create a node and set the node type to string
+	*
+	* Parameter: string
+	*
+	* Return value: JsonValueType::VALUE_TYPE_STRING
+	*/
+	Node* Create_String(string& str);
+
+	/*
+	* Function: Create a node and set the node type to number
+	*
+	* Parameter: double
+	*
+	* Return value: JsonValueType::VALUE_TYPE_DOUBLE
+	*/
+	Node* Create_Number(double num);
+
+	/*
+	* Function: Create a node and set the node type to array
+	*
+	* Parameter: null
+	*
+	* Return value: JsonValueType::VALUE_TYPE_ARRAY
+	*/
+	Node* Create_Array();
+
+	/*
+	* Function: Create a node and set the node type to bool
+	*
+	* Parameter: bool
+	*
+	* Return value: JsonValueType::VALUE_TYPE_BOOL
+	*/
+	Node* Create_Bool(bool boolean);
+
+	/*
+	* Function: Create a node and set the node type to null
+	*
+	* Parameter: null
+	*
+	* Return value: JsonValueType::VALUE_TYPE_NULL
+	*/
+	Node* Create_Null();
+
 
 
 
