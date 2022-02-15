@@ -178,13 +178,7 @@ public:
 
 };
 
-JSON::JSON()
-{
-}
 
-JSON::~JSON()
-{
-}
 
 
 
