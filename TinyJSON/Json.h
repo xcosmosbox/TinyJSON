@@ -11,6 +11,8 @@ using namespace std;
  *	2.CRUD to node
  *	
  *	Using the data structure of double linked list
+ *	
+ *	analysis the data of JSON into the tree of JSON
  */
 
 enum class JsonValueType
@@ -44,7 +46,20 @@ public:
 	Node();
 	~Node();
 
+public:
+	/*
+	* Function: Parse the JSON dataand fill it into the JSON tree
+	* 
+	* Parameter: Pointing the unparsed of JSON data
+	* 
+	* Return value: A node of JSON tree
+	*/
+	Node* parse(string &value);
+
+
+
 };
+
 
 
 
