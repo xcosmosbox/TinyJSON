@@ -11,8 +11,6 @@ using namespace std;
  *	2.CRUD to node
  *	
  *	Using the data structure of double linked list
- *	
- *	analysis the data of JSON into the tree of JSON
  */
 
 enum class JsonValueType
@@ -47,20 +45,70 @@ public:
 	~Node();
 
 public:
+	
+};
+
+
+
+
+class JSON
+{
+private:
+
+
+public:
+	JSON();
+	~JSON();
+
 	/*
 	* Function: Parse the JSON dataand fill it into the JSON tree
-	* 
+	*
 	* Parameter: Pointing the unparsed of JSON data
-	* 
+	*
 	* Return value: A node of JSON tree
 	*/
-	Node* parse(string &value);
+	Node* Parse(const string& value);
+
+	/*
+	* Function: Start recursive traversal from the item node and convert the node tree into a string
+	*
+	* Parameter: JSON node
+	*
+	* Return value: String (Tree string parsed from item node)
+	*/
+	Node* Print(Node* item);
+
+	/*
+	* Function: Recursively release the nodes of the JSON tree from the root node to free memory
+	*
+	* Parameter: JSON node
+	*
+	* Return value: void
+	*/
+	void Recycle_Node(Node* child);
+
+public:
+	/*
+	* Function: Create a node and set the node type to object
+	*
+	* Parameter: null
+	*
+	* Return value: JsonValueType::VALUE_TYPE_OBJECT
+	*/
+	Node* Create_Object();
+
 
 
 
 };
 
+JSON::JSON()
+{
+}
 
+JSON::~JSON()
+{
+}
 
 
 
