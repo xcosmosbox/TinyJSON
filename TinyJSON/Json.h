@@ -142,6 +142,35 @@ public:
 	*/
 	Node* Create_Null();
 
+public:
+	/*
+	* Function: Set the name of the item node to item_ name
+	*			If the object node has no child nodes, set item as the child node of the object node
+	*			Otherwise, add the item to the tail of the object -> child linked list 
+	*			and become the sibling node of the object child node
+	* 
+	* Parameter: 
+	*			obj: added node
+	*			item: node to add
+	*
+	* Return value: JSON&
+	*/
+	JSON& Add_Item_To_Obj(Node* obj, string item_name, Node* item);
+
+	/*
+	* Function: If the array node has no child nodes, set item as the child node of the array node
+	*			Otherwise, add the item to the tail of the array -> child linked list 
+	*			and become the sibling node of the array child node
+	* 
+	* Parameter: 
+	*			obj: added node
+	*			item: node to add
+	*
+	* Return value: JSON&
+	*/
+	JSON& Add_Item_To_Array(Node* array, Node* item);
+
+
 
 
 
