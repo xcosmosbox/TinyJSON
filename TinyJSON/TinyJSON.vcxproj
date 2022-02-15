@@ -142,6 +142,7 @@
     <None Include="..\README.md" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="example.cpp" />
     <ClCompile Include="Json.cpp" />
   </ItemGroup>
   <ItemGroup>
