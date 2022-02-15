@@ -38,6 +38,8 @@ private:
 	double value_double;
 	bool value_bool;
 
+	string node_name;
+
 public:
 	Node();
 	~Node();
