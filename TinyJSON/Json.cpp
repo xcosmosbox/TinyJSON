@@ -76,6 +76,9 @@ Node* JSON::Parse_Opts(string& value, string& return_parse_end, bool require_nul
 {
 	Node* item = New_Node();
 	_end_position = {};
+
+	string end = Parse_Value(item, Skip(value));
+
 	return nullptr;
 }
 
@@ -83,7 +86,7 @@ string JSON::Parse_Value(Node* item, string value)
 {
 	if (value.empty())
 	{
-		return {};
+		return string();
 	}
 	if (value.substr(0,5) == "false")//
 	{
@@ -91,6 +94,41 @@ string JSON::Parse_Value(Node* item, string value)
 		item->_value_bool = false;
 		return value.substr(5);//
 	}
+	if (value.substr(0,4) == "true")
+	{
+		item->_type = NodeValueType::VALUE_TYPE_BOOL;
+		item->_value_bool = true;
+		return value.substr(4);
+	}
+	if (value.substr(0,4) == "null")
+	{
+		item->_type = NodeValueType::VALUE_TYPE_NULL;
+		return value.substr(4);
+	}
+	if (value.size() < 1)
+	{
+		return string();
+	}
+
+	char front = value[0];
+	if (front == '\"')
+	{
+		return Parse_String(item, value);
+	}
+	if (front == '-' || (front >= '0' && front <= '9') || front == '+')
+	{
+		return Parse_Number(item, value);
+	}
+	if (front == '[')
+	{
+		return Parse_Array(item, value);
+	}
+	if (front == '{')
+	{
+		return Parse_Object(item, value);
+	}
+
+	_end_position = value;
 	return string();
 }
 
