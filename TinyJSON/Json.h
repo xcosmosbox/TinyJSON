@@ -14,7 +14,7 @@ using namespace std;
  *	Using the data structure of double linked list
  */
 
-enum class JsonValueType
+enum class NodeValueType
 {
 	VALUE_TYPE_NULL,
 	VALUE_TYPE_BOOL,
@@ -27,24 +27,25 @@ enum class JsonValueType
 
 class Node
 {
+	friend class JSON;
 private:
 	Node* _next = nullptr;
 	Node* _prev = nullptr;
 	Node* _child = nullptr;
 
-	JsonValueType _type = JsonValueType::VALUE_TYPE_NULL;
+	NodeValueType _type = NodeValueType::VALUE_TYPE_NULL;
 
-	string value_string;
-	int value_int;
-	double value_double;
-	bool value_bool;
+	string _value_string;
+	int _value_int;
+	double _value_double;
+	bool _value_bool;
 
-	string node_name;
+	string _node_name;
 
 public:
 	Node();
 	~Node();
-
+private:
 	void clear();
 
 public:
@@ -57,6 +58,7 @@ public:
 class JSON
 {
 private:
+	string _end_position;
 	string _create_nodes_used;
 	vector<Node*> _create_nodes;
 
