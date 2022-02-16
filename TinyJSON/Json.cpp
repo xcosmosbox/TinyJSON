@@ -77,9 +77,25 @@ Node* JSON::Parse_Opts(string& value, string& return_parse_end, bool require_nul
 	Node* item = New_Node();
 	_end_position = {};
 
-	string end = Parse_Value(item, Skip(value));
+	auto end = Parse_Value(item, Skip(value));
+	if (!end.empty())
+	{
+		Recycle_Node(item);
+		return nullptr;
+	}
+	if (require_null_terminate)
+	{
+		end = Skip(end);
+		if (end.size())
+		{
+			_end_position = end;
+			return nullptr;
+		}
+	}
+	return_parse_end = end;
+	return item;
 
-	return nullptr;
+	
 }
 
 string JSON::Parse_Value(Node* item, string value)
@@ -142,8 +158,8 @@ string JSON::Parse_String(Node* item, string value)
 
 	int size = value.size();
 	int length = 0;
-	
-	if (string position = value.find('\"',1))
+	auto position = value.find('\"', 1);
+	if (position)
 	{
 		length = position - 1;
 	}
@@ -166,22 +182,173 @@ string JSON::Parse_String(Node* item, string value)
 	item->_type = NodeValueType::VALUE_TYPE_STRING;
 	item->_value_string = move(str);
 	return value.substr(length + 2);
-
-	return string();
 }
 
 string JSON::Parse_Number(Node* item, string value)
 {
-	return string();
+	bool sign = 1;
+	int start_position = 0;
+	if (value[0] == '-')
+	{
+		sign = false;
+		start_position = 1;
+	}
+	if (value[0] == '+')
+	{
+		sign = true;
+		start_position = 1;
+	}
+	while (value[start_position] == 0)
+	{
+		start_position++;
+	}
+	
+	string num_str;
+	if (value[start_position] >= '0' && value[start_position] <= '9')
+	{
+		while ((value[start_position] >= '0' && value[start_position] <= '9') || value[start_position] == 'e' || value[start_position] == 'E' ||
+			value[start_position] == '.' || (value[start_position - 1] == 'e' && (value[start_position] == '+' || value[start_position] == '-')) ||
+			(value[start_position - 1] == 'E' && (value[start_position] == '+' || value[start_position] == '-')))
+		{
+			num_str += value[start_position];
+			start_position++;
+		}
+	}
+	if (num_str.size() < 1)
+	{
+		return string();
+	}
+
+	double num_double = stod(num_str);
+	int num_int = stol(num_str);
+	if (num_double - num_int > 0)
+	{
+		item->_type = NodeValueType::VALUE_TYPE_DOUBLE;
+		item->_value_double = sign ? num_double : (-num_double);
+	}
+	else
+	{
+		item->_type = NodeValueType::VALUE_TYPE_INT;
+		item->_value_int = sign ? num_int : (-num_int);
+	}
+	return value.substr(start_position);
+	
+
 }
 
 string JSON::Parse_Array(Node* item, string value)
 {
+	Node* child = New_Node();
+	if (value[0] != '[')
+	{
+		_end_position = value[0];
+		return string();
+	}
+
+	item->_type = NodeValueType::VALUE_TYPE_ARRAY;
+	value = Skip(value.substr(1));
+	//[]
+	if (value[0] == ']')
+	{
+		return value.substr(1);
+	}
+
+	item->_child = child;
+	value = Parse_Value(child, Skip(value));
+	if (value.empty())
+	{
+		return string();
+	}
+
+	while (value[0] == ',' && value.size() > 1)
+	{
+		Node* new_item = New_Node();
+		child->_next = new_item;
+		new_item->_prev = child;
+		child = new_item;
+
+		value = Skip(Parse_Value(child, Skip(value.substr(1))));
+		if (value.empty())
+		{
+			return string();
+		}
+	}
+	if (value[0] == ']')
+	{
+		return value.substr(1);
+	}
+	_end_position = value[0];
 	return string();
 }
 
 string JSON::Parse_Object(Node* item, string value)
 {
+	Node* child = New_Node();
+	if (value[0] != '{')
+	{
+		_end_position = value[0];
+		return string();
+	}
+
+	item->_type = NodeValueType::VALUE_TYPE_OBJECT;
+	value = Skip(value.substr(1));
+	if (value.size() && value[0] == '}')
+	{
+		return value.substr(1);
+	}
+
+	item->_child = child;
+	value = Parse_String(child, Skip(value));
+	if (value.empty())
+	{
+		return string();
+	}
+
+	child->_node_name = child->_value_string;
+	child->_value_string.clear();
+	if (Skip(value)[0] != ':')
+	{
+		_end_position = value[0];
+		return string();
+	}
+
+	value = Parse_Value(child, Skip(value.substr(1)));
+	while (value[0] == ',' && value.size() > 1)
+	{
+		Node* new_item = New_Node();
+		child->_next = new_item;
+		new_item->_prev = child;
+		child = new_item;
+
+		value = Skip(Parse_String(child, Skip(value.substr(1))));
+		if (value.empty())
+		{
+			return string();
+		}
+
+		child->_node_name = child->_value_string;
+		child->_value_string.clear();
+		if (Skip(value)[0] != ':')
+		{
+			_end_position = value[0];
+			return string();
+		}
+
+		value = Parse_Value(child, Skip(value.substr(1)));
+		if (value.empty())
+		{
+			return string();
+		}
+	}
+	if (value.empty())
+	{
+		return string();
+	}
+	if (value[0] == '}')
+	{
+		return value.substr(1);
+	}
+	_end_position = value[0];
 	return string();
 }
 
