@@ -45,6 +45,8 @@ public:
 	Node();
 	~Node();
 
+	void clear();
+
 public:
 	
 };
@@ -55,6 +57,8 @@ public:
 class JSON
 {
 private:
+	string _create_nodes_used;
+	vector<Node*> _create_nodes;
 
 
 public:
@@ -68,7 +72,7 @@ public:
 	*
 	* Return value: A node of JSON tree
 	*/
-	Node* Parse(const string& value);
+	Node* Parse(string& value);
 
 	/*
 	* Function: Start recursive traversal from the item node and convert the node tree into a string
@@ -89,7 +93,7 @@ public:
 	void Recycle_Node(Node* child);
 
 private:
-	//Increasing a node
+	//Increasing a new node
 	Node* New_Node();
 
 	/*
@@ -97,6 +101,15 @@ private:
 	* require_null_terminate: if there is a error in parsing, do you want to exit.
 	*/
 	Node* Parse_Opts(string& value, string& return_parse_end, bool require_null_terminate);
+
+	/*
+	* Returns the position where processing is complete
+	*/
+	string Parse_Value(Node* item, string value);
+	string Parse_String(Node* item, string value);
+	string Parse_Number(Node* item, string value);
+	string Parse_Array(Node* item, string value);
+	string Parse_Object(Node* item, string value);
 
 	/*
 	* Finding start position
