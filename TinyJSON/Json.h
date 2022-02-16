@@ -88,6 +88,21 @@ public:
 	*/
 	void Recycle_Node(Node* child);
 
+private:
+	//Increasing a node
+	Node* New_Node();
+
+	/*
+	* return_parse_end: last return position
+	* require_null_terminate: if there is a error in parsing, do you want to exit.
+	*/
+	Node* Parse_Opts(string& value, string& return_parse_end, bool require_null_terminate);
+
+	/*
+	* Finding start position
+	*/
+	string Skip(string value);
+
 public:
 	/*
 	* Function: Create a node and set the node type to object
