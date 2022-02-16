@@ -24,7 +24,9 @@ JSON::~JSON()
 
 Node* JSON::Parse(const string& value)
 {
-	return nullptr;
+	string ret_end;
+	Node* _root = Parse_Opts(value, ret_end,false);
+	return _root;
 }
 
 string JSON::Print(Node* item)
@@ -34,6 +36,21 @@ string JSON::Print(Node* item)
 
 void JSON::Recycle_Node(Node* child)
 {
+}
+
+Node* JSON::Parse_Opts(string& value, string& return_parse_end, bool require_null_terminate)
+{
+	return nullptr;
+}
+
+string JSON::Skip(string value)
+{
+	int start_pos = 0;
+	while (value.size() > start_pos && value[start_pos] <= 32)
+	{
+		start_pos++;
+	}
+	return value.substr(start_pos);
 }
 
 Node* JSON::Create_Object()
