@@ -45,6 +45,18 @@ void JSON::Recycle_Node(Node* child)
 Node* JSON::New_Node()
 {
 	int position = _create_nodes_used.find('0');
+
+	/*
+	* static const size_type npos = -1;
+	* 
+	* This is a special value equal to the maximum value representable by the type size_type. 
+	* The exact meaning depends on context, but it is generally used either as end of string 
+	* indicator by the functions that expect a string index or as the error indicator by the functions that return a string index
+	* 
+	* NOTE: Although the definition uses -1, size_type is an unsigned integer type, 
+	* and the value of npos is the largest positive value it can hold, 
+	* due to signed-to-unsigned implicit conversion. This is a portable way to specify the largest value of any unsigned type
+	*/
 	if (position != std::string::npos)
 	{
 		Node* node = _create_nodes[position];
@@ -52,6 +64,7 @@ Node* JSON::New_Node()
 		node->clear();
 		return node;
 	}
+
 	Node node;
 	Node* node_ptr = &node;
 	_create_nodes_used.push_back('1');
