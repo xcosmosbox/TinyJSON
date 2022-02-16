@@ -134,6 +134,39 @@ string JSON::Parse_Value(Node* item, string value)
 
 string JSON::Parse_String(Node* item, string value)
 {
+	if (value[0] != '\"')
+	{
+		_end_position = value[0];
+		return string();
+	}
+
+	int size = value.size();
+	int length = 0;
+	
+	if (string position = value.find('\"',1))
+	{
+		length = position - 1;
+	}
+
+	if (length < 1)
+	{
+		return string();
+	}
+
+	string new_string = value.substr(1, length);
+	string str(new_string.begin(), new_string.end());
+	for (string::iterator it = str.begin(); it != str.end(); it++)
+	{
+		if(*it == '\"')
+		{
+			it = str.erase(it);
+		}
+	}
+
+	item->_type = NodeValueType::VALUE_TYPE_STRING;
+	item->_value_string = move(str);
+	return value.substr(length + 2);
+
 	return string();
 }
 
