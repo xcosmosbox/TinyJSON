@@ -8,6 +8,10 @@ Node::~Node()
 {
 }
 
+void Node::clear()
+{
+}
+
 
 
 
@@ -22,7 +26,7 @@ JSON::~JSON()
 {
 }
 
-Node* JSON::Parse(const string& value)
+Node* JSON::Parse(string& value)
 {
 	string ret_end;
 	Node* _root = Parse_Opts(value, ret_end,false);
@@ -38,8 +42,26 @@ void JSON::Recycle_Node(Node* child)
 {
 }
 
+Node* JSON::New_Node()
+{
+	int position = _create_nodes_used.find('0');
+	if (position != std::string::npos)
+	{
+		Node* node = _create_nodes[position];
+		_create_nodes_used[position] = '1';
+		node->clear();
+		return node;
+	}
+	Node node;
+	Node* node_ptr = &node;
+	_create_nodes_used.push_back('1');
+	_create_nodes.push_back(node_ptr);
+	return node_ptr;
+}
+
 Node* JSON::Parse_Opts(string& value, string& return_parse_end, bool require_null_terminate)
 {
+	Node* item = New_Node();
 	return nullptr;
 }
 
