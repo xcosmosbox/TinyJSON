@@ -75,7 +75,43 @@ Node* JSON::New_Node()
 Node* JSON::Parse_Opts(string& value, string& return_parse_end, bool require_null_terminate)
 {
 	Node* item = New_Node();
+	_end_position = {};
 	return nullptr;
+}
+
+string JSON::Parse_Value(Node* item, string value)
+{
+	if (value.empty())
+	{
+		return {};
+	}
+	if (value.substr(0,5) == "false")//
+	{
+		item->_type = NodeValueType::VALUE_TYPE_BOOL;
+		item->_value_bool = false;
+		return value.substr(5);//
+	}
+	return string();
+}
+
+string JSON::Parse_String(Node* item, string value)
+{
+	return string();
+}
+
+string JSON::Parse_Number(Node* item, string value)
+{
+	return string();
+}
+
+string JSON::Parse_Array(Node* item, string value)
+{
+	return string();
+}
+
+string JSON::Parse_Object(Node* item, string value)
+{
+	return string();
 }
 
 string JSON::Skip(string value)
