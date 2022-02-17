@@ -1,5 +1,8 @@
 #include"Json.h"
 
+
+//-----------NODE-------------//
+
 Node::Node()
 {
 }
@@ -10,36 +13,71 @@ Node::~Node()
 
 void Node::clear()
 {
+	_next = nullptr, _prev = nullptr, _child = nullptr;
+	_type = NodeValueType::VALUE_TYPE_NULL;
+	_value_string.clear();
+	_node_name.clear();
 }
 
 
 
 
 
-//------------------------
+//-----------JSON-------------//
 
 JSON::JSON()
 {
+	this->_root = nullptr;
 }
 
 JSON::~JSON()
 {
+	for (auto node : _create_nodes)
+	{
+		delete node;
+	}
+	_create_nodes.clear();
+	_create_nodes_used.clear();
 }
 
 Node* JSON::Parse(string& value)
 {
 	string ret_end;
-	Node* _root = Parse_Opts(value, ret_end,false);
+	_root = Parse_Opts(value, ret_end,false);
 	return _root;
 }
 
-string JSON::Print(Node* item)
+string JSON::error_position()
 {
-	return string();
+	return _end_position;
 }
 
-void JSON::Recycle_Node(Node* child)
+void JSON::Recycle_Node(Node* item)
 {
+	auto it = find_if(_create_nodes.begin(), _create_nodes.end(), [item](auto node)
+		{return item == node});
+	if (it != _create_nodes.end())
+	{
+		//created node
+		Node* next;
+		while (item)
+		{
+			next = item->_next;
+			if (item->_child)
+			{
+				Recycle_Node(item->_child);
+			}
+			auto position = distance(_create_nodes.begin(), it);//
+			item->clear();
+			_create_nodes_used[position] = '0';
+			item = next;
+
+		}
+	}
+	else
+	{
+		delete item;
+	}
 }
 
 Node* JSON::New_Node()
@@ -94,8 +132,6 @@ Node* JSON::Parse_Opts(string& value, string& return_parse_end, bool require_nul
 	}
 	return_parse_end = end;
 	return item;
-
-	
 }
 
 string JSON::Parse_Value(Node* item, string value)
@@ -364,40 +400,199 @@ string JSON::Skip(string value)
 
 Node* JSON::Create_Object()
 {
-	return nullptr;
+	Node* item = New_Node();
+	item->_type = NodeValueType::VALUE_TYPE_OBJECT;
+	return item;
 }
 
 Node* JSON::Create_String(string& str)
 {
-	return nullptr;
+	Node* item = New_Node();
+	item->_type = NodeValueType::VALUE_TYPE_STRING;
+	item->_value_string = str;
+	return item;
 }
 
-Node* JSON::Create_Number(double num)
+Node* JSON::Create_String(string&& str)
 {
-	return nullptr;
+	Node* item = New_Node();
+	item->_type = NodeValueType::VALUE_TYPE_STRING;
+	item->_value_string = move(str);
+	return item;
+}
+
+Node* JSON::Create_Double(double num)
+{
+	Node* item = New_Node();
+	item->_type = NodeValueType::VALUE_TYPE_DOUBLE;
+	item->_value_double = num;
+	return item;
+}
+
+Node* JSON::Create_Int(int num)
+{
+	Node* item = New_Node();
+	item->_type = NodeValueType::VALUE_TYPE_INT;
+	item->_value_int = num;
+	return item;
 }
 
 Node* JSON::Create_Array()
 {
-	return nullptr;
+	Node* item = New_Node();
+	item->_type = NodeValueType::VALUE_TYPE_ARRAY;
+	return item;
 }
 
 Node* JSON::Create_Bool(bool boolean)
 {
-	return nullptr;
+	Node* item = New_Node();
+	item->_type = NodeValueType::VALUE_TYPE_BOOL;
+	item->_value_bool = boolean;
+	return item;
 }
 
 Node* JSON::Create_Null()
 {
-	return nullptr;
+	Node* item = New_Node();
+	item->_type = NodeValueType::VALUE_TYPE_NULL;
+	return item;
 }
 
 JSON& JSON::Add_Item_To_Obj(Node* obj, string item_name, Node* item)
 {
-	// TODO: 在此处插入 return 语句
+	if (obj == nullptr)
+	{
+		return *this;
+	}
+		
+	if (item == nullptr)
+	{
+		return *this;
+	}
+		
+	item->_node_name = item_name;
+	obj->_type = NodeValueType::VALUE_TYPE_OBJECT;
+	return Add_Item_To_Array(obj, item);
 }
 
 JSON& JSON::Add_Item_To_Array(Node* array, Node* item)
 {
-	// TODO: 在此处插入 return 语句
+	if (array == nullptr)
+	{
+		return *this;
+	}
+		
+	if (item == nullptr)
+	{
+		return *this;
+	}
+		
+	auto child = array->_child;
+	if (!child)
+	{
+		array->_child = item;
+	}
+	else
+	{
+		while (child && child->_next)
+		{
+			child = child->_next;
+		}
+		Suffix_Object(child, item);
+	}
+	return *this;
+}
+
+
+string JSON::Print(Node* item)
+{
+	return Print_Json(item);
+}
+
+string JSON::Print_Json(Node* obj)
+{
+	return Print_Json(obj, 0);
+}
+
+string JSON::Print_Json(Node* obj, int depth)
+{
+	string out;
+	if (obj == nullptr)
+		return string();
+	switch (obj->_type)
+	{
+	case NodeValueType::VALUE_TYPE_NULL:
+		out = { "null" };
+		return out;
+		break;
+	case NodeValueType::VALUE_TYPE_BOOL:
+		out = obj->_value_bool ? "true" : "false";
+		return out;
+		break;
+	case NodeValueType::VALUE_TYPE_INT:
+		out = to_string(obj->_value_int);
+		return out;
+		break;
+	case NodeValueType::VALUE_TYPE_DOUBLE:
+		out = to_string(obj->_value_double);
+		return out;
+		break;
+	case NodeValueType::VALUE_TYPE_STRING:
+		out = "\"" + obj->_value_string + "\"";
+		return out;
+		break;
+	case NodeValueType::VALUE_TYPE_ARRAY:
+		out = Print_Array(obj, depth);
+		return out;
+		break;
+	case NodeValueType::VALUE_TYPE_OBJECT:
+		out = Print_Object(obj, depth);
+		return out;
+		break;
+	}
+	return out;
+}
+
+string JSON::Print_Array(Node* obj, int depth)
+{
+	string out;
+	if (obj == nullptr)
+		return string();
+	auto child = obj->_child;
+	while (child)
+	{
+		auto ret = Print_Json(child, depth + 1);
+		if (ret.size())
+		{
+			out += (ret + (child->_next ? "," : ""));
+		}
+		child = child->_next;
+	}
+	return "[" + out + "]";
+}
+
+string JSON::Print_Object(Node* obj, int depth)
+{
+	string out;
+	if (obj == nullptr)
+		return string();
+	auto child = obj->_child;
+	while (child)
+	{
+		auto name = "\"" + child->_node_name + "\"";
+		auto ret = Print_Json(child, depth + 1);
+		if (ret.size())
+		{
+			out += (name + ':' + ret + (child->_next ? "," : ""));
+		}
+		child = child->_next;
+	}
+	return "{" + out + "}";
+}
+
+void JSON::Suffix_Object(Node* prev, Node* item)
+{
+	prev->_next = item;
+	item->_prev = prev;
 }
