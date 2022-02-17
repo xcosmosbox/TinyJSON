@@ -44,7 +44,7 @@ private:
 	string _node_name;
 
 public:
-	Node() = default;
+	Node();
 	~Node();
 private:
 	void clear();
