@@ -1,5 +1,4 @@
 #include"Json.h"
-#include <format>
 
 using namespace std;
 
@@ -16,9 +15,6 @@ int main()
 	json.Add_Item_To_Obj(root, "EventType", json.Create_Int(100));
 	cout << json.Print(root) << endl;
 	json.Recycle_Node(root);
-	int1 = json.Create_Int(1);
-	double2 = json.Create_Double(2);
-	string3 = json.Create_String("4444");
 
 	system("pause");
 	return 0;
