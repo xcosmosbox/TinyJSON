@@ -44,14 +44,24 @@ private:
 	string _node_name;
 
 public:
-	Node();
+	Node() = default;
 	~Node();
 private:
 	void clear();
 
 public:
 	size_t size();
+	optional<string> name();
+	optional<int> as_int();
+	optional<double> as_double();
+	optional<bool> as_bool();
+	optional<string> as_string();
 
+	bool is_array();
+	bool is_object();
+	bool is_null();
+
+	vector<Node*> set_child();
 	
 };
 
