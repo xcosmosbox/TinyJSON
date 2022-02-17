@@ -138,7 +138,7 @@ string JSON::Parse_Value(Node* item, string value)
 {
 	if (value.empty())
 	{
-		return string();
+		return {};
 	}
 	if (value.substr(0,5) == "false")//
 	{
@@ -159,7 +159,7 @@ string JSON::Parse_Value(Node* item, string value)
 	}
 	if (value.size() < 1)
 	{
-		return string();
+		return {};
 	}
 
 	char front = value[0];
@@ -181,7 +181,7 @@ string JSON::Parse_Value(Node* item, string value)
 	}
 
 	_end_position = value;
-	return string();
+	return {};
 }
 
 string JSON::Parse_String(Node* item, string value)
@@ -189,7 +189,7 @@ string JSON::Parse_String(Node* item, string value)
 	if (value[0] != '\"')
 	{
 		_end_position = value[0];
-		return string();
+		return {};
 	}
 
 	int size = value.size();
@@ -202,7 +202,7 @@ string JSON::Parse_String(Node* item, string value)
 
 	if (length < 1)
 	{
-		return string();
+		return {};
 	}
 
 	string new_string = value.substr(1, length);
@@ -252,7 +252,7 @@ string JSON::Parse_Number(Node* item, string value)
 	}
 	if (num_str.size() < 1)
 	{
-		return string();
+		return {};
 	}
 
 	double num_double = stod(num_str);
@@ -278,7 +278,7 @@ string JSON::Parse_Array(Node* item, string value)
 	if (value[0] != '[')
 	{
 		_end_position = value[0];
-		return string();
+		return {};
 	}
 
 	item->_type = NodeValueType::VALUE_TYPE_ARRAY;
@@ -293,7 +293,7 @@ string JSON::Parse_Array(Node* item, string value)
 	value = Parse_Value(child, Skip(value));
 	if (value.empty())
 	{
-		return string();
+		return {};
 	}
 
 	while (value[0] == ',' && value.size() > 1)
@@ -306,7 +306,7 @@ string JSON::Parse_Array(Node* item, string value)
 		value = Skip(Parse_Value(child, Skip(value.substr(1))));
 		if (value.empty())
 		{
-			return string();
+			return {};
 		}
 	}
 	if (value[0] == ']')
@@ -314,7 +314,7 @@ string JSON::Parse_Array(Node* item, string value)
 		return value.substr(1);
 	}
 	_end_position = value[0];
-	return string();
+	return {};
 }
 
 string JSON::Parse_Object(Node* item, string value)
@@ -323,7 +323,7 @@ string JSON::Parse_Object(Node* item, string value)
 	if (value[0] != '{')
 	{
 		_end_position = value[0];
-		return string();
+		return {};
 	}
 
 	item->_type = NodeValueType::VALUE_TYPE_OBJECT;
@@ -337,7 +337,7 @@ string JSON::Parse_Object(Node* item, string value)
 	value = Parse_String(child, Skip(value));
 	if (value.empty())
 	{
-		return string();
+		return {};
 	}
 
 	child->_node_name = child->_value_string;
@@ -345,7 +345,7 @@ string JSON::Parse_Object(Node* item, string value)
 	if (Skip(value)[0] != ':')
 	{
 		_end_position = value[0];
-		return string();
+		return {};
 	}
 
 	value = Parse_Value(child, Skip(value.substr(1)));
@@ -359,7 +359,7 @@ string JSON::Parse_Object(Node* item, string value)
 		value = Skip(Parse_String(child, Skip(value.substr(1))));
 		if (value.empty())
 		{
-			return string();
+			return {};
 		}
 
 		child->_node_name = child->_value_string;
@@ -367,25 +367,25 @@ string JSON::Parse_Object(Node* item, string value)
 		if (Skip(value)[0] != ':')
 		{
 			_end_position = value[0];
-			return string();
+			return {};
 		}
 
 		value = Parse_Value(child, Skip(value.substr(1)));
 		if (value.empty())
 		{
-			return string();
+			return {};
 		}
 	}
 	if (value.empty())
 	{
-		return string();
+		return {};
 	}
 	if (value[0] == '}')
 	{
 		return value.substr(1);
 	}
 	_end_position = value[0];
-	return string();
+	return {};
 }
 
 string JSON::Skip(string value)
@@ -519,7 +519,7 @@ string JSON::Print_Json(Node* obj, int depth)
 {
 	string out;
 	if (obj == nullptr)
-		return string();
+		return {};
 	switch (obj->_type)
 	{
 	case NodeValueType::VALUE_TYPE_NULL:
@@ -558,7 +558,7 @@ string JSON::Print_Array(Node* obj, int depth)
 {
 	string out;
 	if (obj == nullptr)
-		return string();
+		return {};
 	auto child = obj->_child;
 	while (child)
 	{
@@ -576,7 +576,7 @@ string JSON::Print_Object(Node* obj, int depth)
 {
 	string out;
 	if (obj == nullptr)
-		return string();
+		return {};
 	auto child = obj->_child;
 	while (child)
 	{
