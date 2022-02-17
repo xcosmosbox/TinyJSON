@@ -4,6 +4,7 @@
 #include<string>
 #include<vector>
 #include<iostream>
+#include<optional>
 
 using namespace std;
 /*
@@ -49,6 +50,8 @@ private:
 	void clear();
 
 public:
+	size_t size();
+
 	
 };
 
@@ -61,6 +64,7 @@ private:
 	string _end_position;
 	string _create_nodes_used;
 	vector<Node*> _create_nodes;
+	Node* _root;
 
 
 public:
@@ -76,23 +80,8 @@ public:
 	*/
 	Node* Parse(string& value);
 
-	/*
-	* Function: Start recursive traversal from the item node and convert the node tree into a string
-	*
-	* Parameter: JSON node
-	*
-	* Return value: String (Tree string parsed from item node)
-	*/
-	string Print(Node* item);
-
-	/*
-	* Function: Recursively release the nodes of the JSON tree from the root node to free memory
-	*
-	* Parameter: JSON node
-	*
-	* Return value: void
-	*/
-	void Recycle_Node(Node* child);
+	/*getting the error position*/
+	string error_position();
 
 private:
 	//Increasing a new node
@@ -136,6 +125,7 @@ public:
 	* Return value: JsonValueType::VALUE_TYPE_STRING
 	*/
 	Node* Create_String(string& str);
+	Node* Create_String(string&& str);
 
 	/*
 	* Function: Create a node and set the node type to number
@@ -144,7 +134,8 @@ public:
 	*
 	* Return value: JsonValueType::VALUE_TYPE_DOUBLE
 	*/
-	Node* Create_Number(double num);
+	Node* Create_Double(double num);
+	Node* Create_Int(int num);
 
 	/*
 	* Function: Create a node and set the node type to array
@@ -201,10 +192,35 @@ public:
 	*/
 	JSON& Add_Item_To_Array(Node* array, Node* item);
 
+	/*
+	* Function: Recursively release the nodes of the JSON tree from the root node to free memory
+	*
+	* Parameter: JSON node
+	*
+	* Return value: void
+	*/
+	void Recycle_Node(Node* item);
 
 
+public:
+	/*
+	* Function: Start recursive traversal from the item node and convert the node tree into a string
+	*
+	* Parameter: JSON node
+	*
+	* Return value: String (Tree string parsed from item node)
+	*/
+	string Print(Node* item);
 
+private:
+	/*Convert structure to string*/
+	string Print_Json(Node* obj);
+	string Print_Json(Node* obj, int depth);
+	string Print_Array(Node* obj, int depth);
+	string Print_Object(Node* obj, int depth);
 
+	//Create structure
+	void Suffix_Object(Node* prev, Node* item);
 
 };
 
