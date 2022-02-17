@@ -13,10 +13,101 @@ Node::~Node()
 
 void Node::clear()
 {
-	_next = nullptr, _prev = nullptr, _child = nullptr;
+	_next = nullptr;
+	_prev = nullptr;
+	_child = nullptr;
 	_type = NodeValueType::VALUE_TYPE_NULL;
 	_value_string.clear();
 	_node_name.clear();
+}
+
+size_t Node::size()
+{
+	size_t child_size = 0;
+	auto child = this->_child;
+	while (child)
+	{
+		child = child->_child;
+		child_size++;
+	}
+	return child_size;
+}
+
+optional<string> Node::name()
+{
+	if (this->_node_name.size())
+	{
+		return this->_node_name;
+	}
+	
+	return nullopt;
+}
+
+optional<int> Node::as_int()
+{
+	if (this->_type == NodeValueType::VALUE_TYPE_INT)
+	{
+		return this->_value_int;
+	}
+		
+	return nullopt;
+}
+
+optional<double> Node::as_double()
+{
+	if (this->_type == NodeValueType::VALUE_TYPE_DOUBLE)
+	{
+		return this->_value_int;
+	}
+		
+	return nullopt;
+}
+
+optional<bool> Node::as_bool()
+{
+	if (this->_type == NodeValueType::VALUE_TYPE_BOOL)
+	{
+		return this->_value_bool;
+	}
+		
+	return nullopt;
+}
+
+optional<string> Node::as_string()
+{
+	if (this->_type == NodeValueType::VALUE_TYPE_STRING)
+	{
+		return this->_value_string;
+	}
+		
+	return nullopt;
+}
+
+bool Node::is_array()
+{
+	return this->_type == NodeValueType::VALUE_TYPE_ARRAY;
+}
+
+bool Node::is_object()
+{
+	return this->_type == NodeValueType::VALUE_TYPE_OBJECT;
+}
+
+bool Node::is_null()
+{
+	return this->_type == NodeValueType::VALUE_TYPE_NULL;
+}
+
+vector<Node*> Node::set_child()
+{
+	vector<Node*> ret;
+	auto child = this->_child;
+	while (child)
+	{
+		ret.push_back(child);
+		child = child->_next;
+	}
+	return ret;
 }
 
 
@@ -32,12 +123,12 @@ JSON::JSON()
 
 JSON::~JSON()
 {
-	for (auto node : _create_nodes)
+	for (auto node : this->_create_nodes)
 	{
 		delete node;
 	}
-	_create_nodes.clear();
-	_create_nodes_used.clear();
+	this->_create_nodes.clear();
+	this->_create_nodes_used.clear();
 }
 
 Node* JSON::Parse(string& value)
@@ -55,7 +146,9 @@ string JSON::error_position()
 void JSON::Recycle_Node(Node* item)
 {
 	auto it = find_if(_create_nodes.begin(), _create_nodes.end(), [item](auto node)
-		{return item == node});
+		{
+			return item == node;
+		});
 	if (it != _create_nodes.end())
 	{
 		//created node
@@ -495,7 +588,7 @@ JSON& JSON::Add_Item_To_Array(Node* array, Node* item)
 	}
 	else
 	{
-		while (child && child->_next)
+		while (child->_next != nullptr)
 		{
 			child = child->_next;
 		}
