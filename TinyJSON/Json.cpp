@@ -196,8 +196,8 @@ Node* JSON::New_Node()
 		return node;
 	}
 
-	Node node;
-	Node* node_ptr = &node;
+	Node* node_ptr = new Node();
+	//Node* node_ptr = &node;
 	_create_nodes_used.push_back('1');
 	_create_nodes.push_back(node_ptr);
 	return node_ptr;
